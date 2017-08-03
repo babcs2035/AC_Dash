@@ -162,7 +162,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Menu.cpp" />
+    <ClCompile Include="Result.cpp" />
+    <ClCompile Include="SBoard.cpp" />
+    <ClCompile Include="SceneMgr.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
@@ -275,6 +280,13 @@
   </ItemGroup>
   <ItemGroup>
     <Font Include="Example\YomogiFont.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Game.h" />
+    <ClInclude Include="Menu.h" />
+    <ClInclude Include="Result.h" />
+    <ClInclude Include="SBoard.h" />
+    <ClInclude Include="SceneMgr.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

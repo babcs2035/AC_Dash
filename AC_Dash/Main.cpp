@@ -1,14 +1,18 @@
-﻿
-# include <Siv3D.hpp>
+﻿// include
+#include <Siv3D.hpp>
+#include "SceneMgr.h"
 
 void Main()
 {
-	const Font font(30);
+	Window::SetStyle(WindowStyle::NonFrame);
+	Window::Resize({ 860,480 }, true);
+	Window::SetTitle(L"AC Dash v1.0");
+	Window::Centering();
 
+	SceneMgr_ChangeScene(Scene_Menu);
 	while (System::Update())
 	{
-		font(L"ようこそ、Siv3D の世界へ！").draw();
-
-		Circle(Mouse::Pos(), 50).draw({ 255, 0, 0, 127 });
+		SceneMgr_Update();
+		SceneMgr_Draw();
 	}
 }
