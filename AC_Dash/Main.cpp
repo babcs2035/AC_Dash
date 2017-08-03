@@ -5,7 +5,7 @@
 void Main()
 {
 	Window::SetStyle(WindowStyle::NonFrame);
-	Window::Resize({ 860,480 }, true);
+	Window::Resize({ 960,480 }, true);
 	Window::SetTitle(L"AC Dash v1.0");
 	Window::Centering();
 
