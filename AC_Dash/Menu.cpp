@@ -43,6 +43,13 @@ void Menu_Update()
 		draw_ac_x = (draw_ac_x >= Window::Width() ? -ac.width : draw_ac_x + DRAW_AC_WA_SPEED);
 		draw_wa_x = (draw_wa_x <= -wa.width ? Window::Width() : draw_wa_x - DRAW_AC_WA_SPEED);
 	}
+
+	// 選択肢 更新
+	{
+		if (SBoardCircle.leftClicked) { SceneMgr_ChangeScene(Scene_SBoard); }
+		if (playCircle.leftClicked) { SceneMgr_ChangeScene(Scene_Game); }
+		if (exitCircle.leftClicked) { exit(0); }
+	}
 }
 
 // メニュー  描画
