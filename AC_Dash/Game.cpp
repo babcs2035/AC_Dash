@@ -3,11 +3,17 @@
 #include "SceneMgr.h"
 #include "Game.h"
 
+// define
+#define MAKE_ITEM_DISTANCE 3250
+#define ITEM_KIND_NUM 2
+
 // グローバル変数
-static Texture main, ground, ac, wa;
+static Texture main, ground, item[ITEM_KIND_NUM];
 static Font statsFont;
-static int draw_ground_x1, draw_ground_x2, draw_speed;
 static int64 score, life;
+static int draw_ground_x1, draw_ground_x2, draw_speed;
+static int draw_item_num, draw_item_x;
+static bool draw_item_flag;
 
 // ゲーム 初期化
 void Game_Init()
@@ -24,12 +30,17 @@ void Game_Init()
 		draw_speed = 5;
 	}
 
-	// ステータス初期化
+	// アイテム 初期化
 	{
-		if (!ac)
+		draw_item_flag = false;
+	}
+
+	// ステータス 初期化
+	{
+		if (!item[0])
 		{
-			ac = Texture(L"data\\Game\\ac.png");
-			wa = Texture(L"data\\Game\\wa.png");
+			item[0] = Texture(L"data\\Game\\ac.png");
+			item[1] = Texture(L"data\\Game\\wa.png");
 			FontManager::Register(L"data\\Game\\scoreboard.ttf");
 			statsFont = Font(32, L"Score Board");
 			score = 0; life = 5;
@@ -46,6 +57,21 @@ void Game_Update()
 		draw_ground_x2 = (draw_ground_x2 <= -Window::Width() ? Window::Width() : draw_ground_x2 - draw_speed);
 	}
 
+	// アイテム 更新
+	{
+		if (draw_item_flag)
+		{
+			if (draw_item_x < -item[draw_item_num].width) { draw_item_flag = false; }
+			draw_item_x -= draw_speed;
+		}
+		if (!draw_item_flag)
+		{
+			draw_item_num = Random(ITEM_KIND_NUM - 1);
+			draw_item_x = Window::Width();
+			draw_item_flag = true;
+		}
+	}
+
 	// ステータス 更新
 	{
 		++score;
@@ -60,6 +86,11 @@ void Game_Draw()
 		main.draw();
 		ground.draw(draw_ground_x1, 0);
 		ground.draw(draw_ground_x2, 0);
+	}
+
+	// アイテム 描画
+	{
+		if (draw_item_flag) { item[draw_item_num].draw(draw_item_x, 0); }
 	}
 
 	// ステータス 描画
