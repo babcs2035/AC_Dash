@@ -61,7 +61,15 @@ void Game_Update()
 	{
 		if (draw_item_flag)
 		{
-			if (draw_item_x < -item[draw_item_num].width) { draw_item_flag = false; }
+			if (draw_item_x < -item[draw_item_num].width)
+			{
+				if (draw_item_num == 0)
+				{
+					score -= 1800;
+					--life;
+				}
+				draw_item_flag = false;
+			}
 			draw_item_x -= draw_speed;
 		}
 		if (!draw_item_flag)
@@ -74,7 +82,29 @@ void Game_Update()
 
 	// ステータス 更新
 	{
+		if (draw_item_flag)
+		{
+			const Rect tmpRect(draw_item_x, 240, item[draw_item_num].width, item[draw_item_num].height);
+			if (tmpRect.leftClicked)
+			{
+				switch (draw_item_num)
+				{
+				case 0:
+					score += 2500;
+					++life;
+					break;
+
+				case 1:
+					score -= 1800;
+					--life;
+					break;
+				}
+				draw_item_flag = false;
+			}
+		}
 		++score;
+		if (life < 1) { SceneMgr_ChangeScene(Scene_Result); }
+		if (score < 0) { score = 0; }
 	}
 }
 
