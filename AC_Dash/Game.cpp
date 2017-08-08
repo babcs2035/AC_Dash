@@ -6,11 +6,14 @@
 // define
 #define MAKE_ITEM_DISTANCE 3250
 #define ITEM_KIND_NUM 2
+#define DRAW_STATS_CHANGED_LENGTH 1125
 
 // グローバル変数
 static Texture main, ground, item[ITEM_KIND_NUM];
 static Font statsFont;
 static int64 score, life;
+static int64 draw_stats_startTime, draw_stats_Time;
+static String statsChanged = L"";
 static int draw_ground_x1, draw_ground_x2, draw_speed;
 static int draw_item_num, draw_item_x;
 static bool draw_item_flag;
@@ -90,21 +93,25 @@ void Game_Update()
 				switch (draw_item_num)
 				{
 				case 0:
-					score += 2500;
+					score += 250;
 					++life;
+					statsChanged = L"+250\n+1";
 					break;
 
 				case 1:
-					score -= 1800;
+					score -= 180;
 					--life;
+					statsChanged = L"-180\n-1";
 					break;
 				}
+				draw_stats_startTime = Time::GetMillisec64();
 				draw_item_flag = false;
 			}
 		}
 		++score;
 		if (life < 1) { SceneMgr_ChangeScene(Scene_Result); }
 		if (score < 0) { score = 0; }
+		draw_stats_Time = Time::GetMillisec64();
 	}
 }
 
@@ -125,7 +132,9 @@ void Game_Draw()
 
 	// ステータス 描画
 	{
-		auto display = Format(L"SCORE:", score, L"\nLIFE :", life);
-		statsFont(display).draw(10, 10);
+		const auto flag = draw_stats_Time - draw_stats_startTime <= DRAW_STATS_CHANGED_LENGTH;
+		const auto display = (flag ? statsChanged : Format(score, L"\n", life));
+		statsFont(L"SCORE:\nLIFE :").draw(10, 10);
+		statsFont(display).draw(192, 10, (flag ? Palette::Orange : Palette::White));
 	}
 }
