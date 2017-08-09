@@ -4,13 +4,14 @@
 #include "Game.h"
 
 // define
-#define MAKE_ITEM_DISTANCE 3250
-#define ITEM_KIND_NUM 2
+#define CHANGE_SPEED_DISTANCE 5250
+#define ITEM_KIND_NUM 3
 #define DRAW_STATS_CHANGED_LENGTH 1125
 
 // グローバル変数
 static Texture main, ground, item[ITEM_KIND_NUM];
 static Font statsFont;
+static int64 startTime, nowTime;
 static int64 score, life;
 static int64 draw_stats_startTime, draw_stats_Time;
 static String statsChanged = L"";
@@ -31,6 +32,7 @@ void Game_Init()
 		draw_ground_x1 = 0;
 		draw_ground_x2 = Window::Width();
 		draw_speed = 5;
+		startTime = Time::GetMillisec64();
 	}
 
 	// アイテム 初期化
@@ -44,6 +46,7 @@ void Game_Init()
 		{
 			item[0] = Texture(L"data\\Game\\ac.png");
 			item[1] = Texture(L"data\\Game\\wa.png");
+			item[2] = Texture(L"data\\Game\\wj.png");
 			FontManager::Register(L"data\\Game\\scoreboard.ttf");
 			statsFont = Font(32, L"Score Board");
 			score = 0; life = 5;
@@ -56,6 +59,12 @@ void Game_Update()
 {
 	// 背景 更新
 	{
+		nowTime = Time::GetMillisec64();
+		if (nowTime - startTime > CHANGE_SPEED_DISTANCE)
+		{
+			startTime = nowTime;
+			++draw_speed;
+		}
 		draw_ground_x1 = (draw_ground_x1 <= -Window::Width() ? Window::Width() : draw_ground_x1 - draw_speed);
 		draw_ground_x2 = (draw_ground_x2 <= -Window::Width() ? Window::Width() : draw_ground_x2 - draw_speed);
 	}
@@ -68,7 +77,7 @@ void Game_Update()
 			{
 				if (draw_item_num == 0)
 				{
-					score -= 1800;
+					score -= 100;
 					--life;
 				}
 				draw_item_flag = false;
@@ -103,12 +112,16 @@ void Game_Update()
 					--life;
 					statsChanged = L"-180\n-1";
 					break;
+
+				case 2:
+					--draw_speed;
+					break;
 				}
 				draw_stats_startTime = Time::GetMillisec64();
 				draw_item_flag = false;
 			}
 		}
-		++score;
+		score += draw_speed;
 		if (life < 1) { SceneMgr_ChangeScene(Scene_Result); }
 		if (score < 0) { score = 0; }
 		draw_stats_Time = Time::GetMillisec64();
