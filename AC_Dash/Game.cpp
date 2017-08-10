@@ -4,17 +4,17 @@
 #include "Game.h"
 
 // define
-#define CHANGE_SPEED_DISTANCE 5250
-#define ITEM_KIND_NUM 3
-#define DRAW_STATS_CHANGED_LENGTH 1125
+#define CHANGE_SPEED_DISTANCE 2500
+#define ITEM_KIND_NUM 5
+#define DRAW_STATS_CHANGED_LENGTH 1500
 
 // グローバル変数
 static Texture main, ground, item[ITEM_KIND_NUM];
 static Font statsFont;
 static int64 startTime, nowTime;
 static int64 score, life;
-static int64 draw_stats_startTime, draw_stats_Time;
-static String statsChanged = L"";
+static int64 draw_stats_startTime, draw_stats_Time, draw_Message_startTime, draw_Message_Time;
+static String statsChanged = L"", statsMessage = L"";
 static int draw_ground_x1, draw_ground_x2, draw_speed;
 static int draw_item_num, draw_item_x;
 static bool draw_item_flag;
@@ -47,10 +47,12 @@ void Game_Init()
 			item[0] = Texture(L"data\\Game\\ac.png");
 			item[1] = Texture(L"data\\Game\\wa.png");
 			item[2] = Texture(L"data\\Game\\wj.png");
+			item[3] = Texture(L"data\\Game\\tle.png");
+			item[4] = Texture(L"data\\Game\\re.png");
 			FontManager::Register(L"data\\Game\\scoreboard.ttf");
 			statsFont = Font(32, L"Score Board");
-			score = 0; life = 5;
 		}
+		score = 0; life = 5;
 	}
 }
 
@@ -94,6 +96,7 @@ void Game_Update()
 
 	// ステータス 更新
 	{
+		draw_stats_Time = draw_Message_Time = Time::GetMillisec64();
 		if (draw_item_flag)
 		{
 			const Rect tmpRect(draw_item_x, 240, item[draw_item_num].width, item[draw_item_num].height);
@@ -105,26 +108,41 @@ void Game_Update()
 					score += 250;
 					++life;
 					statsChanged = L"+250\n+1";
+					draw_stats_Time = draw_stats_startTime = Time::GetMillisec64();
 					break;
 
 				case 1:
 					score -= 180;
 					--life;
 					statsChanged = L"-180\n-1";
+					draw_stats_Time = draw_stats_startTime = Time::GetMillisec64();
 					break;
 
 				case 2:
 					--draw_speed;
+					statsMessage = L"SPEED DOWN!";
+					draw_Message_Time = draw_Message_startTime = Time::GetMillisec64();
+					break;
+
+				case 3:
+					++draw_speed;
+					statsMessage = L"SPEED UP!";
+					draw_Message_Time = draw_Message_startTime = Time::GetMillisec64();
+					break;
+
+				case 4:
+					score -= 100;
+					--life;
+					statsChanged = L"-100\n-1";
+					draw_stats_Time = draw_stats_startTime = Time::GetMillisec64();
 					break;
 				}
-				draw_stats_startTime = Time::GetMillisec64();
 				draw_item_flag = false;
 			}
 		}
 		score += draw_speed;
 		if (life < 1) { SceneMgr_ChangeScene(Scene_Result); }
 		if (score < 0) { score = 0; }
-		draw_stats_Time = Time::GetMillisec64();
 	}
 }
 
@@ -149,5 +167,6 @@ void Game_Draw()
 		const auto display = (flag ? statsChanged : Format(score, L"\n", life));
 		statsFont(L"SCORE:\nLIFE :").draw(10, 10);
 		statsFont(display).draw(192, 10, (flag ? Palette::Orange : Palette::White));
+		if (draw_Message_Time - draw_Message_startTime <= DRAW_STATS_CHANGED_LENGTH) { statsFont(statsMessage).drawCenter(74, Palette::Orange); }
 	}
 }
