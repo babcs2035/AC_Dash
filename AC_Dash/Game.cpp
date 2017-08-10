@@ -88,7 +88,8 @@ void Game_Update()
 		}
 		if (!draw_item_flag)
 		{
-			draw_item_num = Random(ITEM_KIND_NUM - 1);
+			if (RandomBool((double)1/(double)3)) { draw_item_num = 0; }
+			else { draw_item_num = Random(ITEM_KIND_NUM - 1); }
 			draw_item_x = Window::Width();
 			draw_item_flag = true;
 		}
@@ -143,6 +144,12 @@ void Game_Update()
 		score += draw_speed;
 		if (life < 1) { SceneMgr_ChangeScene(Scene_Result); }
 		if (score < 0) { score = 0; }
+		if (life > 15)
+		{
+			life = 15;
+			statsChanged[statsChanged.length - 2] = L'Å}';
+			statsChanged[statsChanged.length - 1] = L'0';
+		}
 	}
 }
 
