@@ -8,3 +8,6 @@ void Game_Update();
 
 // ƒQ[ƒ€ •`‰æ
 void Game_Draw();
+
+// ƒQ[ƒ€à–¾ •`‰æ
+void Game_Expl();

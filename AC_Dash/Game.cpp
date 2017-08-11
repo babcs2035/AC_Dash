@@ -17,7 +17,7 @@ static int64 draw_stats_startTime, draw_stats_Time, draw_Message_startTime, draw
 static String statsChanged = L"", statsMessage = L"";
 static int draw_ground_x1, draw_ground_x2, draw_speed;
 static int draw_item_num, draw_item_x;
-static bool draw_item_flag;
+static bool draw_item_flag, first_flag = true;
 
 // ƒQ[ƒ€ ‰Šú‰»
 void Game_Init()
@@ -54,6 +54,7 @@ void Game_Init()
 		}
 		score = 0; life = 5;
 	}
+	if (first_flag) { Game_Expl(); }
 }
 
 // ƒQ[ƒ€ XV
@@ -178,4 +179,16 @@ void Game_Draw()
 		statsFont(display).draw(192, 10, (flag ? Palette::Orange : Palette::White));
 		if (draw_Message_Time - draw_Message_startTime <= DRAW_STATS_CHANGED_LENGTH) { statsFont(statsMessage).drawCenter(74, Palette::Orange); }
 	}
+}
+
+// ƒQ[ƒ€à–¾ •`‰æ
+void Game_Expl()
+{
+	Texture expl(L"data\\Game\\explain1.png");
+	expl.draw();
+	WaitKey();
+	expl = Texture(L"data\\Game\\explain2.png");
+	expl.draw();
+	WaitKey();
+	first_flag = false;
 }
