@@ -10,7 +10,7 @@
 
 // グローバル変数
 static Texture main, ground, item[ITEM_KIND_NUM];
-static Font statsFont;
+static Font statsFont, font;
 static int64 startTime, nowTime;
 static int64 score, life;
 static int64 draw_stats_startTime, draw_stats_Time, draw_Message_startTime, draw_Message_Time;
@@ -145,7 +145,11 @@ void Game_Update()
 			}
 		}
 		score += draw_speed;
-		if (life < 1) { SceneMgr_ChangeScene(Scene_Result); }
+		if (life < 1)
+		{
+			Game_End();
+			SceneMgr_ChangeScene(Scene_Result);
+		}
 		if (score < 0) { score = 0; }
 		if (life > 15)
 		{
@@ -191,4 +195,16 @@ void Game_Expl()
 	expl.draw();
 	WaitKey();
 	first_flag = false;
+}
+
+// ゲーム終了 描画
+void Game_End()
+{
+	font = Font(32, L"ＭＳゴシック");
+	font(L"GAME OVER!").drawCenter(25);
+	font(L"ゲームオーバー！").drawCenter(90);
+	font = Font(16, L"ＭＳゴシック");
+	font(L"何かキーを押してください...").drawCenter(200);
+	item[1].drawAt(Window::Width() / 2, 350);
+	WaitKey();
 }
