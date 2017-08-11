@@ -81,6 +81,8 @@ void Game_Update()
 				{
 					score -= 100;
 					--life;
+					statsChanged = L"-100\n-1";
+					draw_stats_Time = draw_stats_startTime = Time::GetMillisec64();
 				}
 				draw_item_flag = false;
 			}
