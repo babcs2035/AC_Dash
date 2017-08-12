@@ -4,13 +4,14 @@
 #include "Game.h"
 
 // define
-#define CHANGE_SPEED_DISTANCE 2500
+#define CHANGE_SPEED_DISTANCE 3500
 #define ITEM_KIND_NUM 5
 #define DRAW_STATS_CHANGED_LENGTH 1500
 
 // グローバル変数
 static Texture main, ground, item[ITEM_KIND_NUM];
 static Font statsFont, font;
+static Sound bgm;
 static int64 startTime, nowTime;
 static int64 score, life;
 static int64 draw_stats_startTime, draw_stats_Time, draw_Message_startTime, draw_Message_Time;
@@ -28,19 +29,14 @@ void Game_Init()
 		{
 			main = Texture(L"data\\Game\\main.png");
 			ground = Texture(L"data\\Game\\ground.png");
+			bgm = Sound(L"data\\Game\\bgm.wav");
 		}
 		draw_ground_x1 = 0;
 		draw_ground_x2 = Window::Width();
 		draw_speed = 5;
-		startTime = Time::GetMillisec64();
 	}
 
 	// アイテム 初期化
-	{
-		draw_item_flag = false;
-	}
-
-	// ステータス 初期化
 	{
 		if (!item[0])
 		{
@@ -49,12 +45,20 @@ void Game_Init()
 			item[2] = Texture(L"data\\Game\\wj.png");
 			item[3] = Texture(L"data\\Game\\tle.png");
 			item[4] = Texture(L"data\\Game\\re.png");
-			FontManager::Register(L"data\\Game\\scoreboard.ttf");
-			statsFont = Font(32, L"Score Board");
 		}
+		draw_item_flag = false;
+	}
+
+	// ステータス 初期化
+	{
+		FontManager::Register(L"data\\Game\\scoreboard.ttf");
+		statsFont = Font(32, L"Score Board");
 		score = 0; life = 5;
 	}
 	if (first_flag) { Game_Expl(); }
+	startTime = Time::GetMillisec64();
+	bgm.setLoop(true);
+	bgm.play();
 }
 
 // ゲーム 更新
@@ -67,6 +71,8 @@ void Game_Update()
 		{
 			startTime = nowTime;
 			++draw_speed;
+			statsMessage = L"SPEED UP!";
+			draw_Message_Time = draw_Message_startTime = Time::GetMillisec64();
 		}
 		draw_ground_x1 = (draw_ground_x1 <= -Window::Width() ? Window::Width() : draw_ground_x1 - draw_speed);
 		draw_ground_x2 = (draw_ground_x2 <= -Window::Width() ? Window::Width() : draw_ground_x2 - draw_speed);
@@ -91,7 +97,7 @@ void Game_Update()
 		}
 		if (!draw_item_flag)
 		{
-			if (RandomBool((double)1/(double)3)) { draw_item_num = 0; }
+			if (RandomBool((double)1 / (double)3)) { draw_item_num = 0; }
 			else { draw_item_num = Random(ITEM_KIND_NUM - 1); }
 			draw_item_x = Window::Width();
 			draw_item_flag = true;
@@ -147,7 +153,9 @@ void Game_Update()
 		score += draw_speed;
 		if (life < 1)
 		{
+			bgm.setVolume(0.5);
 			Game_End();
+			bgm.stop();
 			SceneMgr_ChangeScene(Scene_Result);
 		}
 		if (score < 0) { score = 0; }
@@ -178,10 +186,12 @@ void Game_Draw()
 	// ステータス 描画
 	{
 		const auto flag = draw_stats_Time - draw_stats_startTime <= DRAW_STATS_CHANGED_LENGTH;
-		const auto display = (flag ? statsChanged : Format(score, L"\n", life));
+		const auto display = Format(score, L"\n", life);
+		int draw_x = (1 + (int)Log10(score)) * 30;
 		statsFont(L"SCORE:\nLIFE :").draw(10, 10);
-		statsFont(display).draw(192, 10, (flag ? Palette::Orange : Palette::White));
-		if (draw_Message_Time - draw_Message_startTime <= DRAW_STATS_CHANGED_LENGTH) { statsFont(statsMessage).drawCenter(74, Palette::Orange); }
+		statsFont(display).draw(192, 10, Palette::White);
+		if (flag) { statsFont(statsChanged).draw(draw_x + 210, 10, Palette::Orange); }
+		if (draw_Message_Time - draw_Message_startTime <= DRAW_STATS_CHANGED_LENGTH) { statsFont(statsMessage).drawCenter(10 + statsFont.height * 2, Palette::Orange); }
 	}
 }
 
