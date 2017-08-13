@@ -180,7 +180,12 @@ void Game_Draw()
 
 	// アイテム 描画
 	{
-		if (draw_item_flag) { item[draw_item_num].draw(draw_item_x, 0); }
+		if (draw_item_flag)
+		{
+			item[draw_item_num].draw(draw_item_x, 0);
+			const Rect tmpRect(draw_item_x, 240, item[draw_item_num].width, 75);
+			if (tmpRect.mouseOver) { tmpRect.drawFrame(2, 3, Palette::Yellow); }
+		}
 	}
 
 	// ステータス 描画
