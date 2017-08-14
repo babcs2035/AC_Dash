@@ -2,7 +2,6 @@
 #include "SceneMgr.h"
 #include "Menu.h"
 #include "Game.h"
-#include "Result.h"
 #include "SBoard.h"
 
 // ƒOƒ[ƒoƒ‹•Ï”
@@ -19,10 +18,6 @@ void SceneMgr_Update()
 
 	case Scene_Game:
 		Game_Update();
-		break;
-
-	case Scene_Result:
-		Result_Update();
 		break;
 
 	case Scene_SBoard:
@@ -44,10 +39,6 @@ void SceneMgr_Draw()
 		Game_Draw();
 		break;
 
-	case Scene_Result:
-		Result_Draw();
-		break;
-
 	case Scene_SBoard:
 		SBoard_Draw();
 		break;
@@ -67,10 +58,6 @@ void SceneMgr_ChangeScene(Scene_S nextScene)
 
 	case Scene_Game:
 		Game_Init();
-		break;
-
-	case Scene_Result:
-		Result_Init();
 		break;
 
 	case Scene_SBoard:
