@@ -154,9 +154,10 @@ void Game_Update()
 		if (life < 1)
 		{
 			bgm.setVolume(0.5);
+			bgm.setLoop(false);
 			Game_End();
 			bgm.stop();
-			SceneMgr_ChangeScene(Scene_Result);
+			SceneMgr_ChangeScene(Scene_SBoard);
 		}
 		if (score < 0) { score = 0; }
 		if (life > 15)
@@ -215,11 +216,20 @@ void Game_Expl()
 // ゲーム終了 描画
 void Game_End()
 {
-	font = Font(32, L"ＭＳゴシック");
-	font(L"GAME OVER!").drawCenter(25);
-	font(L"ゲームオーバー！").drawCenter(90);
-	font = Font(16, L"ＭＳゴシック");
-	font(L"何かキーを押してください...").drawCenter(200);
-	item[1].drawAt(Window::Width() / 2, 350);
-	WaitKey();
+	const Rect rect(0, 0, Window::Width(), Window::Height());
+	const Font font1(48);
+	const Font font2(36);
+	const Font font3(24);
+	const String text = Format(L"スコアは ", score, L" です！");
+	while (!Input::AnyKeyClicked())
+	{
+		System::Update();
+		main.draw(); ground.draw();
+		item[Random(ITEM_KIND_NUM - 1)].drawAt(RandomVec2(Window::Width(), Window::Height()));
+		rect.draw(Color(64, 64, 64, 200));
+		font1(L"ゲームオーバー").drawCenter(25, Palette::Red);
+		font2(text).drawCenter(150, Palette::Yellow);
+		font3(L"何かキーを押してください...").drawCenter(250);
+		item[1].drawAt(Window::Width() / 2, 350);
+	}
 }
