@@ -16,3 +16,6 @@ void SceneMgr_Draw();
 
 // シーン変更
 void SceneMgr_ChangeScene(Scene_S);
+
+// 前のシーンを得る
+Scene_S getPrevScene();

@@ -233,3 +233,9 @@ void Game_End()
 		item[1].drawAt(Window::Width() / 2, 350);
 	}
 }
+
+// ゲーム スコア取得
+int64 Game_getScore()
+{
+	return score;
+}
