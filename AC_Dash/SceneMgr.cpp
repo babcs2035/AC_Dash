@@ -65,3 +65,9 @@ void SceneMgr_ChangeScene(Scene_S nextScene)
 		break;
 	}
 }
+
+// ‘O‚ÌƒV[ƒ“‚ğ“¾‚é
+Scene_S getPrevScene()
+{
+	return prevScene;
+}

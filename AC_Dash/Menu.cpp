@@ -8,6 +8,7 @@
 
 // グローバル変数
 static Texture ac, wa;
+static Sound bgm;
 static Font titleFont, choiceFont;
 static int32 draw_ac_x, draw_wa_x;
 static Circle SBoardCircle, playCircle, exitCircle;
@@ -33,6 +34,10 @@ void Menu_Init()
 		exitCircle.x = Window::Center().x + exitCircle.r * 2 + 25;
 		SBoardCircle.y = playCircle.y = exitCircle.y = 25 * 2 + titleFont.height + exitCircle.r;
 	}
+
+	bgm = Sound(L"data\\Menu\\bgm.ogg");
+	bgm.setLoop(true);
+	bgm.play();
 }
 
 // メニュー  更新
@@ -46,8 +51,16 @@ void Menu_Update()
 
 	// 選択肢 更新
 	{
-		if (SBoardCircle.leftClicked) { SceneMgr_ChangeScene(Scene_SBoard); }
-		if (playCircle.leftClicked) { SceneMgr_ChangeScene(Scene_Game); }
+		if (SBoardCircle.leftClicked)
+		{
+			bgm.stop();
+			SceneMgr_ChangeScene(Scene_SBoard);
+		}
+		if (playCircle.leftClicked)
+		{
+			bgm.stop();
+			SceneMgr_ChangeScene(Scene_Game);
+		}
 		if (exitCircle.leftClicked) { exit(0); }
 	}
 }
