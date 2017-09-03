@@ -221,16 +221,22 @@ void Game_End()
 	const Font font2(36);
 	const Font font3(24);
 	const String text = Format(L"スコアは ", score, L" です！");
-	while (!Input::AnyKeyClicked())
+	while (!Input::AnyKeyClicked() || Input::KeyT.clicked)
 	{
 		System::Update();
+		if(Input::KeyT.clicked)
+		{
+			const auto tmp = Format(L"#AC_Dash v1.0 をプレイし、スコア ", score, L" 点を獲得しました！");
+			Twitter::OpenTweetWindow(tmp);
+		}
 		main.draw(); ground.draw();
 		item[Random(ITEM_KIND_NUM - 1)].drawAt(RandomVec2(Window::Width(), Window::Height()));
 		rect.draw(Color(64, 64, 64, 200));
 		font1(L"ゲームオーバー").drawCenter(25, Palette::Red);
 		font2(text).drawCenter(150, Palette::Yellow);
-		font3(L"何かキーを押してください...").drawCenter(250);
-		item[1].drawAt(Window::Width() / 2, 350);
+		font3(L"Ｔキーを押してスコアをツイート！").drawCenter(250, Palette::Aqua);
+		font3(L"何かキーを押してください...").drawCenter(350);
+		item[1].drawAt(Window::Width() / 2, 450);
 	}
 }
 
