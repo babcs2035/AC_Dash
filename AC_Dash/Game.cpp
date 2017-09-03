@@ -226,7 +226,26 @@ void Game_End()
 		System::Update();
 		if(Input::KeyT.clicked)
 		{
-			const auto tmp = Format(L"#AC_Dash v1.0 をプレイし、スコア ", score, L" 点を獲得しました！");
+			auto tmp = Format(L"#AC_Dash v1.0 をプレイし、スコア ", score, L" 点を獲得しました！最後に出現したアイテムは ");
+			switch (draw_item_num)
+			{
+			case 0:
+				tmp += L"AC";
+				break;
+			case 1:
+				tmp += L"WA";
+				break;
+			case 2:
+				tmp += L"WJ";
+				break;
+			case 3:
+				tmp += L"TLE";
+				break;
+			case 4:
+				tmp += L"RE";
+				break;
+			}
+			tmp += L" でした。";
 			Twitter::OpenTweetWindow(tmp);
 		}
 		main.draw(); ground.draw();
@@ -235,8 +254,8 @@ void Game_End()
 		font1(L"ゲームオーバー").drawCenter(25, Palette::Red);
 		font2(text).drawCenter(150, Palette::Yellow);
 		font3(L"Ｔキーを押してスコアをツイート！").drawCenter(250, Palette::Aqua);
-		font3(L"何かキーを押してください...").drawCenter(350);
-		item[1].drawAt(Window::Width() / 2, 450);
+		font3(L"何かキーを押してください...").drawCenter(300);
+		item[draw_item_num].drawAt(Window::Width() / 2, 350);
 	}
 }
 

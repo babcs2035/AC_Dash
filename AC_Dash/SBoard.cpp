@@ -30,7 +30,7 @@ void SBoard_Init()
 		cellFont = Font(32);
 		textFont = Font(24);
 		const CSVReader csv(L"data\\Sboard\\saveData.csv");
-		for (int i = 0; i < csv.rows; ++i)
+		for (int i = 0; i < (signed)csv.rows; ++i)
 		{
 			data.push_back({ csv.get<String>(i,0),csv.get<int64>(i,1) });
 		}
@@ -46,7 +46,7 @@ void SBoard_Update()
 	if (goUp.leftClicked) { --drawCellBegin; }
 	if (goDown.leftClicked) { ++drawCellBegin; }
 	drawCellBegin += Mouse::Wheel();
-	drawCellBegin = Min<int>(drawCellBegin, data.size() - MAX_CELL_NUM);
+	drawCellBegin = Min<int>(drawCellBegin, (int)data.size() - MAX_CELL_NUM);
 	drawCellBegin = Max(drawCellBegin, 0);
 }
 
@@ -55,8 +55,8 @@ void SBoard_Draw()
 {
 	titleFont(L"スコアボード").drawCenter(5);
 	if (drawCellBegin > 0) { goUp.draw(goUp.mouseOver ? Palette::Orange : Palette::White); }
-	if (drawCellBegin + MAX_CELL_NUM < data.size()) { goDown.draw(goDown.mouseOver ? Palette::Orange : Palette::White); }
-	for (int i = 0; i < Min<int>(MAX_CELL_NUM, data.size() - drawCellBegin); ++i)
+	if (drawCellBegin + MAX_CELL_NUM < (signed)data.size()) { goDown.draw(goDown.mouseOver ? Palette::Orange : Palette::White); }
+	for (int i = 0; i < Min<int>(MAX_CELL_NUM, (int)data.size() - drawCellBegin); ++i)
 	{
 		auto num = i + drawCellBegin;
 		auto text = Format(num + 1, L"位　", data[num].name, L"　", data[num].score, L"点");
