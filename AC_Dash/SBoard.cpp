@@ -19,6 +19,7 @@ static Font titleFont, cellFont, textFont;
 static Triangle goUp({ 480,101 }, { 510,111 }, { 450,111 });
 static Triangle goDown({ 450,417 }, { 510,417 }, { 480,427 });
 static String userName = L"";
+static Font font1, font2;
 static int drawCellBegin;
 
 // スコアボード 初期化
@@ -29,13 +30,32 @@ void SBoard_Init()
 		titleFont = Font(48);
 		cellFont = Font(32);
 		textFont = Font(24);
+		font1 = Font(24);
+		font2 = Font(18);
 		const CSVReader csv(L"data\\Sboard\\saveData.csv");
 		for (int i = 0; i < (signed)csv.rows; ++i)
 		{
 			data.push_back({ csv.get<String>(i,0),csv.get<int64>(i,1) });
 		}
 	}
-	if (getPrevScene() == Scene_Game) { SBoard_Record(); }
+	if (getPrevScene() == Scene_Game) { SceneMgr_ChangeScene(Scene_Record); }
+	if (getPrevScene() == Scene_Record)
+	{
+		userName.erase(userName.length - 1);
+		CSVWriter csv(L"data\\SBoard\\saveData.csv");
+		bool isOverWrite = false;
+		for (auto i : data)
+		{
+			if (i.name == userName)
+			{
+				i.score = Game_getScore();
+				isOverWrite = true;
+			}
+		}
+		if (!isOverWrite) { data.push_back({ userName,Game_getScore() }); }
+		std::sort(data.begin(), data.end(), [](const auto&l, const auto&r) {return l.score > r.score; });
+		for (auto i : data) { csv.writeRow(i.name, i.score); }
+	}
 	drawCellBegin = 0;
 }
 
@@ -85,27 +105,9 @@ void SBoard_Draw()
 // スコアボード 記録
 void SBoard_Record()
 {
-	const Font font1(24), font2(18);
-	CSVWriter csv(L"data\\SBoard\\saveData.csv");
-	bool isOverWrite = false;
-	while (System::Update())
-	{
-		if (userName.length > 0 && userName[userName.length - 1] == L'\n') { break; }
-		font1(L"スコアボードに記録する名前を入力してください！").drawCenter(25);
-		Input::GetCharsHelper(userName);
-		if (userName.length > 10 && userName[userName.length - 1] != L'\n') { userName.erase(10, userName.length - 2); }
-		font2(userName).draw(25, 25 + font1.height);
-	}
-	userName.erase(userName.length - 1);
-	for (auto i : data)
-	{
-		if (i.name == userName)
-		{
-			i.score = Game_getScore();
-			isOverWrite = true;
-		}
-	}
-	if (!isOverWrite) { data.push_back({ userName,Game_getScore() }); }
-	for (auto i : data) { csv.writeRow(i.name, i.score); }
-	std::sort(data.begin(), data.end(), [](const auto&l, const auto&r) {return l.score > r.score; });
+	font1(L"スコアボードに記録する名前を入力してください！").drawCenter(25);
+	Input::GetCharsHelper(userName);
+	if (userName.length > 10 && userName[userName.length - 1] != L'\n') { userName.erase(10, userName.length - 1); }
+	font2(userName).draw(25, 25 + font1.height);
+	if (userName.length > 0 && userName[userName.length - 1] == L'\n') { SceneMgr_ChangeScene(Scene_SBoard); }
 }
