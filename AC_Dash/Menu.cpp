@@ -61,7 +61,7 @@ void Menu_Update()
 			bgm.stop();
 			SceneMgr_ChangeScene(Scene_Game);
 		}
-		if (exitCircle.leftClicked) { exit(0); }
+		if (exitCircle.leftClicked) { System::Exit(); }
 	}
 }
 
