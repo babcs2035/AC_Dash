@@ -18,24 +18,30 @@ void Menu_Init()
 {
 	// îwåi èâä˙âª
 	{
-		ac = Texture(L"data\\Menu\\ac.png");
-		wa = Texture(L"data\\Menu\\wa.png");
+		if (!ac)
+		{
+			ac = Texture(L"data\\Menu\\ac.png");
+			wa = Texture(L"data\\Menu\\wa.png");
+			bgm = Sound(L"data\\Menu\\bgm.ogg");
+		}
 		draw_ac_x = -ac.width;
 		draw_wa_x = Window::Width();
 	}
 
 	// ëIëéà èâä˙âª
 	{
-		titleFont = Font(64);
-		choiceFont = Font(24);
-		SBoardCircle = playCircle = exitCircle = Circle(128);
-		SBoardCircle.x = Window::Center().x - SBoardCircle.r * 2 - 25;
-		playCircle.x = Window::Center().x;
-		exitCircle.x = Window::Center().x + exitCircle.r * 2 + 25;
-		SBoardCircle.y = playCircle.y = exitCircle.y = 25 * 2 + titleFont.height + exitCircle.r;
+		if (!titleFont)
+		{
+			titleFont = Font(64);
+			choiceFont = Font(24);
+			SBoardCircle = playCircle = exitCircle = Circle(128);
+			SBoardCircle.x = Window::Center().x - SBoardCircle.r * 2 - 25;
+			playCircle.x = Window::Center().x;
+			exitCircle.x = Window::Center().x + exitCircle.r * 2 + 25;
+			SBoardCircle.y = playCircle.y = exitCircle.y = 25 * 2 + titleFont.height + exitCircle.r;
+		}
 	}
 
-	bgm = Sound(L"data\\Menu\\bgm.ogg");
 	bgm.setLoop(true);
 	bgm.play();
 }
