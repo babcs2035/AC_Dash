@@ -11,7 +11,7 @@ static Texture ac, wa;
 static Sound bgm, sel;
 static Font titleFont, choiceFont;
 static Circle SBoardCircle, playCircle, exitCircle;
-static String prevOverCircle;
+static String prevOverCircle = L"";
 static int64 nowTime;
 static double draw_ac_x, draw_wa_x;
 

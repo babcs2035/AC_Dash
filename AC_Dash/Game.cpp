@@ -114,7 +114,7 @@ void Game_Update()
 		draw_stats_Time = draw_Message_Time = Time::GetMillisec64();
 		if (draw_item_flag)
 		{
-			const Rect tmpRect(draw_item_x, 240, item[draw_item_num].width, item[draw_item_num].height);
+			const Rect tmpRect((int)draw_item_x, 240, item[draw_item_num].width, item[draw_item_num].height);
 			if (tmpRect.leftClicked)
 			{
 				switch (draw_item_num)
@@ -160,7 +160,7 @@ void Game_Update()
 				draw_item_flag = false;
 			}
 		}
-		score += d;
+		score += (int64)d;
 		if (life < 1)
 		{
 			bgm.setVolume(0.5);
@@ -195,7 +195,7 @@ void Game_Draw()
 		if (draw_item_flag)
 		{
 			item[draw_item_num].draw(draw_item_x, 0);
-			const Rect tmpRect(draw_item_x, 240, item[draw_item_num].width, 75);
+			const Rect tmpRect((int)draw_item_x, 240, item[draw_item_num].width, 75);
 			if (tmpRect.mouseOver) { tmpRect.drawFrame(2, 3, Palette::Yellow); }
 		}
 	}
