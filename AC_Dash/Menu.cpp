@@ -4,14 +4,15 @@
 #include "Menu.h"
 
 // define
-#define DRAW_AC_WA_SPEED 3
+#define MOVE_AC_WA_PER_SEC 300
 
 // グローバル変数
 static Texture ac, wa;
 static Sound bgm;
 static Font titleFont, choiceFont;
-static int32 draw_ac_x, draw_wa_x;
 static Circle SBoardCircle, playCircle, exitCircle;
+static int64 nowTime;
+static double draw_ac_x, draw_wa_x;
 
 // メニュー 初期化
 void Menu_Init()
@@ -42,6 +43,7 @@ void Menu_Init()
 		}
 	}
 
+	nowTime = Time::GetMillisec64();
 	bgm.setLoop(true);
 	bgm.play();
 }
@@ -51,8 +53,8 @@ void Menu_Update()
 {
 	// 背景 更新
 	{
-		draw_ac_x = (draw_ac_x >= Window::Width() ? -ac.width : draw_ac_x + DRAW_AC_WA_SPEED);
-		draw_wa_x = (draw_wa_x <= -wa.width ? Window::Width() : draw_wa_x - DRAW_AC_WA_SPEED);
+		draw_ac_x = (draw_ac_x >= Window::Width() ? -ac.width : draw_ac_x + (double)MOVE_AC_WA_PER_SEC*(Time::GetMillisec64() - nowTime) / 1000);
+		draw_wa_x = (draw_wa_x <= -wa.width ? Window::Width() : draw_wa_x - (double)MOVE_AC_WA_PER_SEC*(Time::GetMillisec64() - nowTime) / 1000);
 	}
 
 	// 選択肢 更新
@@ -69,6 +71,7 @@ void Menu_Update()
 		}
 		if (exitCircle.leftClicked) { System::Exit(); }
 	}
+	nowTime = Time::GetMillisec64();
 }
 
 // メニュー  描画
