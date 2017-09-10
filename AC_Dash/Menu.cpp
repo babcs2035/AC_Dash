@@ -8,9 +8,10 @@
 
 // グローバル変数
 static Texture ac, wa;
-static Sound bgm;
+static Sound bgm, sel;
 static Font titleFont, choiceFont;
 static Circle SBoardCircle, playCircle, exitCircle;
+static String prevOverCircle;
 static int64 nowTime;
 static double draw_ac_x, draw_wa_x;
 
@@ -24,6 +25,7 @@ void Menu_Init()
 			ac = Texture(L"data\\Menu\\ac.png");
 			wa = Texture(L"data\\Menu\\wa.png");
 			bgm = Sound(L"data\\Menu\\bgm.ogg");
+			sel = Sound(L"data\\Menu\\select.wav");
 		}
 		draw_ac_x = -ac.width;
 		draw_wa_x = Window::Width();
@@ -44,6 +46,7 @@ void Menu_Init()
 	}
 
 	nowTime = Time::GetMillisec64();
+	bgm.setVolume(0.9);
 	bgm.setLoop(true);
 	bgm.play();
 }
@@ -88,15 +91,39 @@ void Menu_Draw()
 		titleFont(L"AC Dash v1.0").drawCenter(25);
 		SBoardCircle.drawShadow({ 0, 8 }, 28, 6);
 		SBoardCircle.draw(Palette::Gold);
-		if (SBoardCircle.mouseOver) { SBoardCircle.drawFrame(5, 5, Palette::Red); }
+		if (SBoardCircle.mouseOver)
+		{
+			SBoardCircle.drawFrame(5, 5, Palette::Red);
+			if (prevOverCircle != L"SBoardCircle")
+			{
+				sel.play();
+				prevOverCircle = L"SBoardCircle";
+			}
+		}
 		choiceFont(L"スコアボード\n　 を見る").drawCenter(SBoardCircle.x, SBoardCircle.y, Palette::Black);
 		playCircle.drawShadow({ 0, 8 }, 28, 6);
 		playCircle.draw(Palette::Lightskyblue);
-		if (playCircle.mouseOver) { playCircle.drawFrame(5, 5, Palette::Red); }
+		if (playCircle.mouseOver)
+		{
+			playCircle.drawFrame(5, 5, Palette::Red);
+			if (prevOverCircle != L"playCircle")
+			{
+				sel.play();
+				prevOverCircle = L"playCircle";
+			}
+		}
 		choiceFont(L"ゲーム開始！").drawCenter(playCircle.x, playCircle.y, Palette::Black);
 		exitCircle.drawShadow({ 0, 8 }, 28, 6);
 		exitCircle.draw(Palette::Orange);
-		if (exitCircle.mouseOver) { exitCircle.drawFrame(5, 5, Palette::Red); }
+		if (exitCircle.mouseOver)
+		{
+			exitCircle.drawFrame(5, 5, Palette::Red);
+			if (prevOverCircle != L"exitCircle")
+			{
+				sel.play();
+				prevOverCircle = L"exitCircle";
+			}
+		}
 		choiceFont(L"終了する").drawCenter(exitCircle.x, exitCircle.y, Palette::Black);
 	}
 }
