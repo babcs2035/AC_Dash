@@ -4,7 +4,7 @@
 #include "Game.h"
 
 // define
-#define CHANGE_SPEED_DISTANCE 3500
+#define CHANGE_SPEED_DISTANCE 3000
 #define ITEM_KIND_NUM 5
 #define DRAW_STATS_CHANGED_LENGTH 1500
 
@@ -16,8 +16,8 @@ static int64 startTime, nowTime;
 static int64 score, life;
 static int64 draw_stats_startTime, draw_stats_Time, draw_Message_startTime, draw_Message_Time;
 static String statsChanged = L"", statsMessage = L"";
-static int draw_ground_x1, draw_ground_x2, draw_speed;
-static int draw_item_num, draw_item_x;
+static double draw_ground_x1, draw_ground_x2, draw_item_x, draw_speed;
+static int draw_item_num;
 static bool draw_item_flag, first_flag = true;
 
 // ゲーム 初期化
@@ -56,7 +56,7 @@ void Game_Init()
 		score = 0; life = 5;
 	}
 	if (first_flag) { Game_Expl(); }
-	startTime = Time::GetMillisec64();
+	nowTime = startTime = Time::GetMillisec64();
 	bgm.setLoop(true);
 	bgm.play();
 }
@@ -64,9 +64,10 @@ void Game_Init()
 // ゲーム 更新
 void Game_Update()
 {
+	auto d = (double)(draw_speed * 60)*(Time::GetMillisec64() - nowTime) / 1000;
+
 	// 背景 更新
 	{
-		nowTime = Time::GetMillisec64();
 		if (nowTime - startTime > CHANGE_SPEED_DISTANCE)
 		{
 			startTime = nowTime;
@@ -74,8 +75,8 @@ void Game_Update()
 			statsMessage = L"SPEED UP!";
 			draw_Message_Time = draw_Message_startTime = Time::GetMillisec64();
 		}
-		draw_ground_x1 = (draw_ground_x1 <= -Window::Width() ? Window::Width() : draw_ground_x1 - draw_speed);
-		draw_ground_x2 = (draw_ground_x2 <= -Window::Width() ? Window::Width() : draw_ground_x2 - draw_speed);
+		draw_ground_x1 = (draw_ground_x1 <= -Window::Width() ? Window::Width() : draw_ground_x1 - d);
+		draw_ground_x2 = (draw_ground_x2 <= -Window::Width() ? Window::Width() : draw_ground_x2 - d);
 	}
 
 	// アイテム 更新
@@ -93,7 +94,7 @@ void Game_Update()
 				}
 				draw_item_flag = false;
 			}
-			draw_item_x -= draw_speed;
+			draw_item_x -= d;
 		}
 		if (!draw_item_flag)
 		{
@@ -150,7 +151,7 @@ void Game_Update()
 				draw_item_flag = false;
 			}
 		}
-		score += draw_speed;
+		score += d;
 		if (life < 1)
 		{
 			bgm.setVolume(0.5);
@@ -167,6 +168,7 @@ void Game_Update()
 			statsChanged[statsChanged.length - 1] = L'0';
 		}
 	}
+	nowTime = Time::GetMillisec64();
 }
 
 // ゲーム 描画
@@ -205,11 +207,21 @@ void Game_Draw()
 void Game_Expl()
 {
 	Texture expl(L"data\\Game\\explain1.png");
-	expl.draw();
-	WaitKey();
+	static RoundRect button1(Window::Width() / 2 - (font(L"次に進む").region().w + font.height) / 2, Window::Height() - font.height - 5, font(L"次に進む").region().w + font.height, font.height, 5);
+	static RoundRect button2(Window::Width() - font(L"ゲームに進む").region().w - font.height - 5, Window::Height() - font.height - 5, font(L"ゲームに進む").region().w + font.height, font.height, 5);
+	while (!button1.leftClicked && System::Update())
+	{
+		expl.draw();
+		button1.draw(button1.mouseOver ? Palette::Orange : Palette::White);
+		font(L"次に進む").drawCenter(Window::Height() - font.height - 5, Palette::Black);
+	}
 	expl = Texture(L"data\\Game\\explain2.png");
-	expl.draw();
-	WaitKey();
+	while (!button2.leftClicked && System::Update())
+	{
+		expl.draw();
+		button2.draw(button2.mouseOver ? Palette::Orange : Palette::White);
+		font(L"ゲームに進む").draw(Window::Width() - font(L"ゲームに進む").region().w - font.height / 2 - 5, Window::Height() - font.height - 5, Palette::Black);
+	}
 	first_flag = false;
 }
 
