@@ -6,6 +6,7 @@
 
 // define
 #define MAX_CELL_NUM 5
+#define MOVE_X_PER_SEC 300
 
 struct cell_data
 {
@@ -15,23 +16,35 @@ struct cell_data
 
 // グローバル変数
 static std::vector<cell_data>data;
-static Font titleFont, cellFont, textFont;
+static Texture ac, wa;
+static Font titleFont, cellFont, textFont, font1, font2;
 static Triangle goUp({ 480,101 }, { 510,111 }, { 450,111 });
-static Triangle goDown({ 450,417 }, { 510,417 }, { 480,427 });
+static Triangle goDown({ 450,415 }, { 510,415 }, { 480,425 });
+static RoundRect button;
 static String userName = L"";
-static Font font1, font2;
+static int64 nowTime;
 static int drawCellBegin;
+static double draw_ac_x, draw_wa_x;
 
 // スコアボード 初期化
 void SBoard_Init()
 {
 	if (data.size() == 0)
 	{
+		ac = Texture(L"data\\Menu\\ac.png");
+		wa = Texture(L"data\\Menu\\wa.png");
+		draw_ac_x = -ac.width;
+		draw_wa_x = Window::Width();
 		titleFont = Font(48);
 		cellFont = Font(32);
 		textFont = Font(24);
 		font1 = Font(24);
 		font2 = Font(18);
+		button.w = textFont(L"メニューに戻る").region().w + textFont.height;
+		button.h = textFont.height;
+		button.x = Window::Width() / 2 - button.w / 2;
+		button.y = Window::Height() - textFont.height - 5;
+		button.r = 5;
 		const CSVReader csv(L"data\\Sboard\\saveData.csv");
 		for (int i = 0; i < (signed)csv.rows; ++i)
 		{
@@ -44,12 +57,13 @@ void SBoard_Init()
 		userName.erase(userName.length - 1);
 		CSVWriter csv(L"data\\SBoard\\saveData.csv");
 		bool isOverWrite = false;
-		for (auto i : data)
+		for (auto& i : data)
 		{
 			if (i.name == userName)
 			{
-				i.score = Game_getScore();
+				i.score = Max(i.score, Game_getScore());
 				isOverWrite = true;
+				break;
 			}
 		}
 		if (!isOverWrite) { data.push_back({ userName,Game_getScore() }); }
@@ -57,12 +71,16 @@ void SBoard_Init()
 		for (auto i : data) { csv.writeRow(i.name, i.score); }
 	}
 	drawCellBegin = 0;
+	nowTime = Time::GetMillisec64();
 }
 
 // スコアボード 更新
 void SBoard_Update()
 {
-	if (Input::KeyB.clicked) { SceneMgr_ChangeScene(Scene_Menu); }
+	if (button.leftClicked) { SceneMgr_ChangeScene(Scene_Menu); }
+	draw_ac_x = (draw_ac_x >= Window::Width() ? -ac.width : draw_ac_x + (double)MOVE_X_PER_SEC*(Time::GetMillisec64() - nowTime) / 1000);
+	draw_wa_x = (draw_wa_x <= -wa.width ? Window::Width() : draw_wa_x - (double)MOVE_X_PER_SEC*(Time::GetMillisec64() - nowTime) / 1000);
+	nowTime = Time::GetMillisec64();
 	if (goUp.leftClicked) { --drawCellBegin; }
 	if (goDown.leftClicked) { ++drawCellBegin; }
 	drawCellBegin += Mouse::Wheel();
@@ -73,6 +91,8 @@ void SBoard_Update()
 // スコアボード 描画
 void SBoard_Draw()
 {
+	ac.draw(draw_ac_x, Window::Center().y - ac.height);
+	wa.draw(draw_wa_x, Window::Center().y);
 	titleFont(L"スコアボード").drawCenter(5);
 	if (drawCellBegin > 0) { goUp.draw(goUp.mouseOver ? Palette::Orange : Palette::White); }
 	if (drawCellBegin + MAX_CELL_NUM < (signed)data.size()) { goDown.draw(goDown.mouseOver ? Palette::Orange : Palette::White); }
@@ -90,16 +110,17 @@ void SBoard_Draw()
 			color = Palette::Silver;
 			break;
 		case 2:
-			color = Palette::Brown;
+			color = Color(196, 112, 34);
 			break;
 		default:
 			color = Palette::White;
 			break;
 		}
-		if (data[num].name == userName) { color = Palette::Red; }
+		if (data[num].name == userName) { color = Palette::Orange; }
 		cellFont(text).drawCenter(5 + titleFont.height + i * cellFont.height, color);
 	}
-	textFont(L"メニューに戻るにはＢキーを押してください...").drawCenter(Window::Height() - textFont.height - 5);
+	button.draw(button.mouseOver ? Palette::Orange : Palette::White);
+	textFont(L"メニューに戻る").drawCenter(Window::Height() - textFont.height - 5, Palette::Black);
 }
 
 // スコアボード 記録
