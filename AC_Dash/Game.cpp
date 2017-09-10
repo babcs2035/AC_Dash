@@ -11,7 +11,7 @@
 // ÉOÉçÅ[ÉoÉãïœêî
 static Texture main, ground, item[ITEM_KIND_NUM];
 static Font statsFont, font;
-static Sound bgm;
+static Sound bgm, ok, ng;
 static int64 startTime, nowTime;
 static int64 score, life;
 static int64 draw_stats_startTime, draw_stats_Time, draw_Message_startTime, draw_Message_Time;
@@ -30,6 +30,8 @@ void Game_Init()
 			main = Texture(L"data\\Game\\main.png");
 			ground = Texture(L"data\\Game\\ground.png");
 			bgm = Sound(L"data\\Game\\bgm.wav");
+			ok = Sound(L"data\\Game\\ok.wav");
+			ng = Sound(L"data\\Game\\ng.wav");
 		}
 		draw_ground_x1 = 0;
 		draw_ground_x2 = Window::Width();
@@ -58,6 +60,7 @@ void Game_Init()
 	if (first_flag) { Game_Expl(); }
 	nowTime = startTime = Time::GetMillisec64();
 	bgm.setLoop(true);
+	bgm.setVolume(0.9);
 	bgm.play();
 }
 
@@ -90,6 +93,7 @@ void Game_Update()
 					score -= 100;
 					--life;
 					statsChanged = L"-100\n-1";
+					ng.play();
 					draw_stats_Time = draw_stats_startTime = Time::GetMillisec64();
 				}
 				draw_item_flag = false;
@@ -119,6 +123,7 @@ void Game_Update()
 					score += 250;
 					++life;
 					statsChanged = L"+250\n+1";
+					ok.play();
 					draw_stats_Time = draw_stats_startTime = Time::GetMillisec64();
 					break;
 
@@ -126,18 +131,21 @@ void Game_Update()
 					score -= 180;
 					--life;
 					statsChanged = L"-180\n-1";
+					ng.play();
 					draw_stats_Time = draw_stats_startTime = Time::GetMillisec64();
 					break;
 
 				case 2:
 					--draw_speed;
 					statsMessage = L"SPEED DOWN!";
+					ok.play();
 					draw_Message_Time = draw_Message_startTime = Time::GetMillisec64();
 					break;
 
 				case 3:
 					++draw_speed;
 					statsMessage = L"SPEED UP!";
+					ng.play();
 					draw_Message_Time = draw_Message_startTime = Time::GetMillisec64();
 					break;
 
@@ -145,6 +153,7 @@ void Game_Update()
 					score -= 100;
 					--life;
 					statsChanged = L"-100\n-1";
+					ng.play();
 					draw_stats_Time = draw_stats_startTime = Time::GetMillisec64();
 					break;
 				}
