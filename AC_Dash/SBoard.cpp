@@ -44,12 +44,13 @@ void SBoard_Init()
 		userName.erase(userName.length - 1);
 		CSVWriter csv(L"data\\SBoard\\saveData.csv");
 		bool isOverWrite = false;
-		for (auto i : data)
+		for (auto& i : data)
 		{
 			if (i.name == userName)
 			{
-				i.score = Game_getScore();
+				i.score = Max(i.score, Game_getScore());
 				isOverWrite = true;
+				break;
 			}
 		}
 		if (!isOverWrite) { data.push_back({ userName,Game_getScore() }); }
