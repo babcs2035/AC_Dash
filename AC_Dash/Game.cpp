@@ -4,7 +4,7 @@
 #include "Game.h"
 
 // define
-#define CHANGE_SPEED_DISTANCE 3500
+#define CHANGE_SPEED_DISTANCE 3000
 #define ITEM_KIND_NUM 5
 #define DRAW_STATS_CHANGED_LENGTH 1500
 
@@ -16,8 +16,8 @@ static int64 startTime, nowTime;
 static int64 score, life;
 static int64 draw_stats_startTime, draw_stats_Time, draw_Message_startTime, draw_Message_Time;
 static String statsChanged = L"", statsMessage = L"";
-static int draw_ground_x1, draw_ground_x2, draw_speed;
-static int draw_item_num, draw_item_x;
+static double draw_ground_x1, draw_ground_x2, draw_item_x, draw_speed;
+static int draw_item_num;
 static bool draw_item_flag, first_flag = true;
 
 // ƒQ[ƒ€ ‰Šú‰»
@@ -56,7 +56,7 @@ void Game_Init()
 		score = 0; life = 5;
 	}
 	if (first_flag) { Game_Expl(); }
-	startTime = Time::GetMillisec64();
+	nowTime = startTime = Time::GetMillisec64();
 	bgm.setLoop(true);
 	bgm.play();
 }
@@ -64,9 +64,10 @@ void Game_Init()
 // ƒQ[ƒ€ XV
 void Game_Update()
 {
+	auto d = (double)(draw_speed * 60)*(Time::GetMillisec64() - nowTime) / 1000;
+
 	// ”wŒi XV
 	{
-		nowTime = Time::GetMillisec64();
 		if (nowTime - startTime > CHANGE_SPEED_DISTANCE)
 		{
 			startTime = nowTime;
@@ -74,8 +75,8 @@ void Game_Update()
 			statsMessage = L"SPEED UP!";
 			draw_Message_Time = draw_Message_startTime = Time::GetMillisec64();
 		}
-		draw_ground_x1 = (draw_ground_x1 <= -Window::Width() ? Window::Width() : draw_ground_x1 - draw_speed);
-		draw_ground_x2 = (draw_ground_x2 <= -Window::Width() ? Window::Width() : draw_ground_x2 - draw_speed);
+		draw_ground_x1 = (draw_ground_x1 <= -Window::Width() ? Window::Width() : draw_ground_x1 - d);
+		draw_ground_x2 = (draw_ground_x2 <= -Window::Width() ? Window::Width() : draw_ground_x2 - d);
 	}
 
 	// ƒAƒCƒeƒ€ XV
@@ -93,7 +94,7 @@ void Game_Update()
 				}
 				draw_item_flag = false;
 			}
-			draw_item_x -= draw_speed;
+			draw_item_x -= d;
 		}
 		if (!draw_item_flag)
 		{
@@ -150,7 +151,7 @@ void Game_Update()
 				draw_item_flag = false;
 			}
 		}
-		score += draw_speed;
+		score += d;
 		if (life < 1)
 		{
 			bgm.setVolume(0.5);
@@ -167,6 +168,7 @@ void Game_Update()
 			statsChanged[statsChanged.length - 1] = L'0';
 		}
 	}
+	nowTime = Time::GetMillisec64();
 }
 
 // ƒQ[ƒ€ •`‰æ
