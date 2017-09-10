@@ -205,11 +205,21 @@ void Game_Draw()
 void Game_Expl()
 {
 	Texture expl(L"data\\Game\\explain1.png");
-	expl.draw();
-	WaitKey();
+	static RoundRect button1(Window::Width() / 2 - (font(L"次に進む").region().w + font.height) / 2, Window::Height() - font.height - 5, font(L"次に進む").region().w + font.height, font.height, 5);
+	static RoundRect button2(Window::Width() - font(L"ゲームに進む").region().w - font.height - 5, Window::Height() - font.height - 5, font(L"ゲームに進む").region().w + font.height, font.height, 5);
+	while (!button1.leftClicked && System::Update())
+	{
+		expl.draw();
+		button1.draw(button1.mouseOver ? Palette::Orange : Palette::White);
+		font(L"次に進む").drawCenter(Window::Height() - font.height - 5, Palette::Black);
+	}
 	expl = Texture(L"data\\Game\\explain2.png");
-	expl.draw();
-	WaitKey();
+	while (!button2.leftClicked && System::Update())
+	{
+		expl.draw();
+		button2.draw(button2.mouseOver ? Palette::Orange : Palette::White);
+		font(L"ゲームに進む").draw(Window::Width() - font(L"ゲームに進む").region().w - font.height / 2 - 5, Window::Height() - font.height - 5, Palette::Black);
+	}
 	first_flag = false;
 }
 
