@@ -20,7 +20,7 @@ static Texture ac, wa;
 static Font titleFont, cellFont, textFont, font1, font2;
 static Triangle goUp({ 480,101 }, { 510,111 }, { 450,111 });
 static Triangle goDown({ 450,415 }, { 510,415 }, { 480,425 });
-static RoundRect button;
+static RoundRect button1, button2;
 static String userName = L"";
 static int64 nowTime;
 static int drawCellBegin;
@@ -40,11 +40,16 @@ void SBoard_Init()
 		textFont = Font(24);
 		font1 = Font(24);
 		font2 = Font(18);
-		button.w = textFont(L"メニューに戻る").region().w + textFont.height;
-		button.h = textFont.height;
-		button.x = Window::Width() / 2 - button.w / 2;
-		button.y = Window::Height() - textFont.height - 5;
-		button.r = 5;
+		button1.w = textFont(L"メニューに戻る").region().w + textFont.height;
+		button1.h = textFont.height;
+		button1.x = Window::Width() / 2 - button1.w / 2;
+		button1.y = Window::Height() - textFont.height - 5;
+		button1.r = 5;
+		button2.w = textFont(L"決定").region().w + textFont.height;
+		button2.h = textFont.height;
+		button2.x = Window::Width() / 2 - button2.w / 2;
+		button2.y = 35 + font1.height + font2.height;
+		button2.r = 5;
 		const CSVReader csv(L"data\\Sboard\\saveData.csv");
 		for (int i = 0; i < (signed)csv.rows; ++i)
 		{
@@ -77,7 +82,7 @@ void SBoard_Init()
 // スコアボード 更新
 void SBoard_Update()
 {
-	if (button.leftClicked) { SceneMgr_ChangeScene(Scene_Menu); }
+	if (button1.leftClicked) { SceneMgr_ChangeScene(Scene_Menu); }
 	draw_ac_x = (draw_ac_x >= Window::Width() ? -ac.width : draw_ac_x + (double)MOVE_X_PER_SEC*(Time::GetMillisec64() - nowTime) / 1000);
 	draw_wa_x = (draw_wa_x <= -wa.width ? Window::Width() : draw_wa_x - (double)MOVE_X_PER_SEC*(Time::GetMillisec64() - nowTime) / 1000);
 	nowTime = Time::GetMillisec64();
@@ -119,7 +124,7 @@ void SBoard_Draw()
 		if (data[num].name == userName) { color = Palette::Orange; }
 		cellFont(text).drawCenter(5 + titleFont.height + i * cellFont.height, color);
 	}
-	button.draw(button.mouseOver ? Palette::Orange : Palette::White);
+	button1.draw(button1.mouseOver ? Palette::Orange : Palette::White);
 	textFont(L"メニューに戻る").drawCenter(Window::Height() - textFont.height - 5, Palette::Black);
 }
 
@@ -129,6 +134,8 @@ void SBoard_Record()
 	font1(L"スコアボードに記録する名前を入力してください！").drawCenter(25);
 	Input::GetCharsHelper(userName);
 	if (userName.length > 10 && userName[userName.length - 1] != L'\n') { userName.erase(10, userName.length - 1); }
-	font2(userName).draw(25, 25 + font1.height);
-	if (userName.length > 0 && userName[userName.length - 1] == L'\n') { SceneMgr_ChangeScene(Scene_SBoard); }
+	font2(userName).drawCenter(30 + font1.height);
+	button2.draw(button2.mouseOver ? Palette::Orange : Palette::White);
+	textFont(L"決定").drawCenter(35 + font1.height + font2.height, Palette::Black);
+	if (button2.leftClicked && userName.length > 1) { SceneMgr_ChangeScene(Scene_SBoard); }
 }
