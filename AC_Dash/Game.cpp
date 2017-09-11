@@ -242,7 +242,14 @@ void Game_End()
 	const Font font2(36);
 	const Font font3(24);
 	const String text = Format(L"スコアは ", score, L" です！");
-	while (!Input::AnyKeyClicked() || Input::KeyT.clicked)
+	RoundRect button;
+	button.w = font3(L"次に進む").region().w + font3.height;
+	button.h = font3.height;
+	button.x = Window::Width() / 2 - button.w / 2;
+	button.y = 325;
+	button.r = 5;
+
+	while (!button.leftClicked)
 	{
 		System::Update();
 		if(Input::KeyT.clicked)
@@ -275,8 +282,9 @@ void Game_End()
 		font1(L"ゲームオーバー").drawCenter(25, Palette::Red);
 		font2(text).drawCenter(150, Palette::Yellow);
 		font3(L"Ｔキーを押してスコアをツイート！").drawCenter(250, Palette::Aqua);
-		font3(L"何かキーを押してください...").drawCenter(300);
-		item[draw_item_num].drawAt(Window::Width() / 2, 350);
+		button.draw(button.mouseOver ? Palette::Orange : Palette::White);
+		font3(L"次に進む").drawCenter(325, Palette::Black);
+		item[1].drawAt(Window::Width() / 2, 330 + font3.height);
 	}
 }
 
