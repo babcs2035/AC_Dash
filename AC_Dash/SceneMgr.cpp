@@ -20,6 +20,14 @@ void SceneMgr_Update()
 		Game_Update();
 		break;
 
+	case Scene_Result:
+		Game_End();
+		break;
+
+	case Scene_Record:
+		SBoard_Record();
+		break;
+
 	case Scene_SBoard:
 		SBoard_Update();
 		break;

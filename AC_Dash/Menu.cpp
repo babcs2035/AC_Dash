@@ -4,38 +4,49 @@
 #include "Menu.h"
 
 // define
-#define DRAW_AC_WA_SPEED 3
+#define MOVE_AC_WA_PER_SEC 300
 
 // グローバル変数
 static Texture ac, wa;
-static Sound bgm;
+static Sound bgm, sel;
 static Font titleFont, choiceFont;
-static int32 draw_ac_x, draw_wa_x;
 static Circle SBoardCircle, playCircle, exitCircle;
+static String prevOverCircle = L"";
+static int64 nowTime;
+static double draw_ac_x, draw_wa_x;
 
 // メニュー 初期化
 void Menu_Init()
 {
 	// 背景 初期化
 	{
-		ac = Texture(L"data\\Menu\\ac.png");
-		wa = Texture(L"data\\Menu\\wa.png");
+		if (!ac)
+		{
+			ac = Texture(L"data\\Menu\\ac.png");
+			wa = Texture(L"data\\Menu\\wa.png");
+			bgm = Sound(L"data\\Menu\\bgm.ogg");
+			sel = Sound(L"data\\Menu\\select.wav");
+		}
 		draw_ac_x = -ac.width;
 		draw_wa_x = Window::Width();
 	}
 
 	// 選択肢 初期化
 	{
-		titleFont = Font(64);
-		choiceFont = Font(24);
-		SBoardCircle = playCircle = exitCircle = Circle(128);
-		SBoardCircle.x = Window::Center().x - SBoardCircle.r * 2 - 25;
-		playCircle.x = Window::Center().x;
-		exitCircle.x = Window::Center().x + exitCircle.r * 2 + 25;
-		SBoardCircle.y = playCircle.y = exitCircle.y = 25 * 2 + titleFont.height + exitCircle.r;
+		if (!titleFont)
+		{
+			titleFont = Font(64);
+			choiceFont = Font(24);
+			SBoardCircle = playCircle = exitCircle = Circle(128);
+			SBoardCircle.x = Window::Center().x - SBoardCircle.r * 2 - 25;
+			playCircle.x = Window::Center().x;
+			exitCircle.x = Window::Center().x + exitCircle.r * 2 + 25;
+			SBoardCircle.y = playCircle.y = exitCircle.y = 25 * 2 + titleFont.height + exitCircle.r;
+		}
 	}
 
-	bgm = Sound(L"data\\Menu\\bgm.ogg");
+	nowTime = Time::GetMillisec64();
+	bgm.setVolume(0.9);
 	bgm.setLoop(true);
 	bgm.play();
 }
@@ -45,8 +56,8 @@ void Menu_Update()
 {
 	// 背景 更新
 	{
-		draw_ac_x = (draw_ac_x >= Window::Width() ? -ac.width : draw_ac_x + DRAW_AC_WA_SPEED);
-		draw_wa_x = (draw_wa_x <= -wa.width ? Window::Width() : draw_wa_x - DRAW_AC_WA_SPEED);
+		draw_ac_x = (draw_ac_x >= Window::Width() ? -ac.width : draw_ac_x + (double)MOVE_AC_WA_PER_SEC*(Time::GetMillisec64() - nowTime) / 1000);
+		draw_wa_x = (draw_wa_x <= -wa.width ? Window::Width() : draw_wa_x - (double)MOVE_AC_WA_PER_SEC*(Time::GetMillisec64() - nowTime) / 1000);
 	}
 
 	// 選択肢 更新
@@ -61,8 +72,9 @@ void Menu_Update()
 			bgm.stop();
 			SceneMgr_ChangeScene(Scene_Game);
 		}
-		if (exitCircle.leftClicked) { exit(0); }
+		if (exitCircle.leftClicked) { System::Exit(); }
 	}
+	nowTime = Time::GetMillisec64();
 }
 
 // メニュー  描画
@@ -79,15 +91,39 @@ void Menu_Draw()
 		titleFont(L"AC Dash v1.0").drawCenter(25);
 		SBoardCircle.drawShadow({ 0, 8 }, 28, 6);
 		SBoardCircle.draw(Palette::Gold);
-		if (SBoardCircle.mouseOver) { SBoardCircle.drawFrame(5, 5, Palette::Red); }
+		if (SBoardCircle.mouseOver)
+		{
+			SBoardCircle.drawFrame(5, 5, Palette::Red);
+			if (prevOverCircle != L"SBoardCircle")
+			{
+				sel.play();
+				prevOverCircle = L"SBoardCircle";
+			}
+		}
 		choiceFont(L"スコアボード\n　 を見る").drawCenter(SBoardCircle.x, SBoardCircle.y, Palette::Black);
 		playCircle.drawShadow({ 0, 8 }, 28, 6);
 		playCircle.draw(Palette::Lightskyblue);
-		if (playCircle.mouseOver) { playCircle.drawFrame(5, 5, Palette::Red); }
+		if (playCircle.mouseOver)
+		{
+			playCircle.drawFrame(5, 5, Palette::Red);
+			if (prevOverCircle != L"playCircle")
+			{
+				sel.play();
+				prevOverCircle = L"playCircle";
+			}
+		}
 		choiceFont(L"ゲーム開始！").drawCenter(playCircle.x, playCircle.y, Palette::Black);
 		exitCircle.drawShadow({ 0, 8 }, 28, 6);
 		exitCircle.draw(Palette::Orange);
-		if (exitCircle.mouseOver) { exitCircle.drawFrame(5, 5, Palette::Red); }
+		if (exitCircle.mouseOver)
+		{
+			exitCircle.drawFrame(5, 5, Palette::Red);
+			if (prevOverCircle != L"exitCircle")
+			{
+				sel.play();
+				prevOverCircle = L"exitCircle";
+			}
+		}
 		choiceFont(L"終了する").drawCenter(exitCircle.x, exitCircle.y, Palette::Black);
 	}
 }

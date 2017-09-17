@@ -4,9 +4,8 @@
 
 void Main()
 {
-	Window::SetStyle(WindowStyle::NonFrame);
-	Window::Resize({ 960,480 }, true);
 	Window::SetTitle(L"AC Dash v1.0");
+	Window::Resize({ 960,480 }, true);
 	Window::Centering();
 
 	SceneMgr_ChangeScene(Scene_Menu);
