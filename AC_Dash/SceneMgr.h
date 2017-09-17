@@ -5,6 +5,7 @@ typedef enum
 {
 	Scene_Menu,
 	Scene_Game,
+	Scene_Result,
 	Scene_Record,
 	Scene_SBoard,
 }Scene_S;

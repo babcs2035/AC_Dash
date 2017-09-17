@@ -19,6 +19,12 @@ static String statsChanged = L"", statsMessage = L"";
 static double draw_ground_x1, draw_ground_x2, draw_item_x, draw_speed;
 static int draw_item_num;
 static bool draw_item_flag, first_flag = true;
+static Rect allRect;
+static Font font1;
+static Font font2;
+static Font font3;
+static String text = L"";
+RoundRect button;
 
 // ゲーム 初期化
 void Game_Init()
@@ -32,6 +38,10 @@ void Game_Init()
 			bgm = Sound(L"data\\Game\\bgm.wav");
 			ok = Sound(L"data\\Game\\ok.wav");
 			ng = Sound(L"data\\Game\\ng.wav");
+			allRect = Rect(0, 0, Window::Width(), Window::Height());
+			font1 = Font(48);
+			font2 = Font(36);
+			font3 = Font(24);
 		}
 		draw_ground_x1 = 0;
 		draw_ground_x2 = Window::Width();
@@ -165,9 +175,7 @@ void Game_Update()
 		{
 			bgm.setVolume(0.5);
 			bgm.setLoop(false);
-			Game_End();
-			bgm.stop();
-			SceneMgr_ChangeScene(Scene_SBoard);
+			SceneMgr_ChangeScene(Scene_Result);
 		}
 		if (score < 0) { score = 0; }
 		if (life > 15)
@@ -237,55 +245,47 @@ void Game_Expl()
 // ゲーム終了 描画
 void Game_End()
 {
-	const Rect rect(0, 0, Window::Width(), Window::Height());
-	const Font font1(48);
-	const Font font2(36);
-	const Font font3(24);
-	const String text = Format(L"スコアは ", score, L" です！");
-	RoundRect button;
 	button.w = font3(L"次に進む").region().w + font3.height;
 	button.h = font3.height;
 	button.x = Window::Width() / 2 - button.w / 2;
 	button.y = 325;
 	button.r = 5;
+	text = Format(L"スコアは ", score, L" です！");
 
-	while (!button.leftClicked)
+	if (button.leftClicked) { SceneMgr_ChangeScene(Scene_SBoard); }
+	if (Input::KeyT.clicked)
 	{
-		System::Update();
-		if(Input::KeyT.clicked)
+		auto tmp = Format(L"#AC_Dash v1.0 をプレイし、スコア ", score, L" 点を獲得しました！最後に出現したアイテムは ");
+		switch (draw_item_num)
 		{
-			auto tmp = Format(L"#AC_Dash v1.0 をプレイし、スコア ", score, L" 点を獲得しました！最後に出現したアイテムは ");
-			switch (draw_item_num)
-			{
-			case 0:
-				tmp += L"AC";
-				break;
-			case 1:
-				tmp += L"WA";
-				break;
-			case 2:
-				tmp += L"WJ";
-				break;
-			case 3:
-				tmp += L"TLE";
-				break;
-			case 4:
-				tmp += L"RE";
-				break;
-			}
-			tmp += L" でした。";
-			Twitter::OpenTweetWindow(tmp);
+		case 0:
+			tmp += L"AC";
+			break;
+		case 1:
+			tmp += L"WA";
+			break;
+		case 2:
+			tmp += L"WJ";
+			break;
+		case 3:
+			tmp += L"TLE";
+			break;
+		case 4:
+			tmp += L"RE";
+			break;
 		}
-		main.draw(); ground.draw();
-		item[Random(ITEM_KIND_NUM - 1)].drawAt(RandomVec2(Window::Width(), Window::Height()));
-		rect.draw(Color(64, 64, 64, 200));
-		font1(L"ゲームオーバー").drawCenter(25, Palette::Red);
-		font2(text).drawCenter(150, Palette::Yellow);
-		font3(L"Ｔキーを押してスコアをツイート！").drawCenter(250, Palette::Aqua);
-		button.draw(button.mouseOver ? Palette::Orange : Palette::White);
-		font3(L"次に進む").drawCenter(325, Palette::Black);
-		item[1].drawAt(Window::Width() / 2, 330 + font3.height);
+		tmp += L" でした。";
+		Twitter::OpenTweetWindow(tmp);
 	}
+	main.draw(); ground.draw();
+	item[Random(ITEM_KIND_NUM - 1)].drawAt(RandomVec2(Window::Width(), Window::Height()));
+	allRect.draw(Color(64, 64, 64, 200));
+	font1(L"ゲームオーバー").drawCenter(25, Palette::Red);
+	font2(text).drawCenter(150, Palette::Yellow);
+	font3(L"Ｔキーを押してスコアをツイート！").drawCenter(250, Palette::Aqua);
+	button.draw(button.mouseOver ? Palette::Orange : Palette::White);
+	font3(L"次に進む").drawCenter(325, Palette::Black);
+	item[1].drawAt(Window::Width() / 2, 330 + font3.height);
 }
 
 // ゲーム スコア取得

@@ -56,10 +56,14 @@ void SBoard_Init()
 			data.push_back({ csv.get<String>(i,0),csv.get<int64>(i,1) });
 		}
 	}
-	if (getPrevScene() == Scene_Game) { SceneMgr_ChangeScene(Scene_Record); }
+	if (getPrevScene() == Scene_Result)
+	{
+		SceneMgr_ChangeScene(Scene_Record);
+		return;
+	}
 	if (getPrevScene() == Scene_Record)
 	{
-		userName.erase(userName.length - 1);
+		if (userName[userName.length - 1] == L'\n') { userName.erase(userName.length - 1); }
 		CSVWriter csv(L"data\\SBoard\\saveData.csv");
 		bool isOverWrite = false;
 		for (auto& i : data)
